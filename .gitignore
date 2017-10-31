@@ -6,3 +6,12 @@
 /captures
 .externalNativeBuild
 /.idea
+bannerslider/\.idea/
+
+bannerslider/gradle/wrapper/
+
+bannerslider/gradlew
+
+bannerslider/gradlew\.bat
+
+bannerslider/local\.properties
