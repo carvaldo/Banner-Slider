@@ -2,6 +2,7 @@ package ss.com.bannerslider.views;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -118,9 +119,8 @@ public class BannerSlider extends FrameLayout implements ViewPager.OnPageChangeL
             post(new Runnable() {
                 @Override
                 public void run() {
-                    if (getContext() instanceof AppCompatActivity) {
-                        hostActivity = (AppCompatActivity) getContext();
-                    } else {
+                    hostActivity = getActivity();
+                    if (hostActivity == null) {
                         throw new RuntimeException("Host activity must extend AppCompatActivity");
                     }
                     boolean mustMakeViewPagerWrapContent = getLayoutParams().height == ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -266,7 +266,7 @@ public class BannerSlider extends FrameLayout implements ViewPager.OnPageChangeL
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    ((AppCompatActivity) getContext()).runOnUiThread(new Runnable() {
+                    hostActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             if (!mustLoopSlides) {
@@ -514,5 +514,16 @@ public class BannerSlider extends FrameLayout implements ViewPager.OnPageChangeL
         this.slideIndicatorsGroup.setSlides(0);
         invalidate();
         requestLayout();
+    }
+
+    private AppCompatActivity getActivity() {
+        Context context = getContext();
+        while (context instanceof ContextWrapper) {
+            if (context instanceof AppCompatActivity) {
+                return (AppCompatActivity) context;
+            }
+            context = ((ContextWrapper)context).getBaseContext();
+        }
+        return null;
     }
 }
